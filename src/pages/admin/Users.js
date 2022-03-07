@@ -38,6 +38,11 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     paddingTop: theme.spacing(10),
     paddingLeft: theme.spacing(33),
+    "@media (max-width: 780px)": {
+      padding: theme.spacing(0),
+      marginLeft: theme.spacing(0),
+      marginTop: theme.spacing(8),
+    },
   },
 }));
 

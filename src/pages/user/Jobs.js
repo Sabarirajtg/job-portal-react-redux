@@ -38,14 +38,23 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexGrow: 1,
     paddingTop: theme.spacing(5),
-
     paddingLeft: theme.spacing(33),
+    "@media (max-width: 780px)": {
+      padding: theme.spacing(0),
+      marginLeft: theme.spacing(0),
+      marginTop: theme.spacing(8),
+    },
   },
   box: {
     paddingTop: theme.spacing(5),
     paddingLeft: theme.spacing(60),
     maxWidth: 1200,
     color: "black",
+    "@media (max-width: 780px)": {
+      padding: theme.spacing(0),
+      marginLeft: theme.spacing(0),
+      marginTop: theme.spacing(8),
+    },
   },
 }));
 

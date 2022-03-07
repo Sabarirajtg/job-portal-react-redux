@@ -43,6 +43,11 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     paddingTop: theme.spacing(8),
     paddingLeft: theme.spacing(33),
+    "@media (max-width: 780px)": {
+      padding: theme.spacing(0),
+      marginLeft: theme.spacing(0),
+      marginTop: theme.spacing(8),
+    },
   },
 }));
 
@@ -72,7 +77,7 @@ export default function AddJob() {
     if (location.state !== null)
       dispatch(modifyJob(id, jobName, type, description));
     else dispatch(addJob(uuid(), jobName, type, description));
-    openSnackbar("Submitted")
+    openSnackbar("Submitted");
   };
   const classes = useStyles();
 

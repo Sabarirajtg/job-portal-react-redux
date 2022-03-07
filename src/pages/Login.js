@@ -6,7 +6,6 @@ import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import { useNavigate } from "react-router";
 import Typography from "@material-ui/core/Typography";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React from "react";
@@ -46,7 +45,7 @@ const options = {
 };
 
 export default function Login() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [openSnackbar] = useSnackbar(options);
   const users = useSelector((state) => state.userReducer);
   // console.log(users);
@@ -66,7 +65,7 @@ export default function Login() {
     } else {
       if (users[index].password === userData.password) {
         localStorage.setItem("userData",JSON.stringify(users[index]))
-        navigate('/jobs')
+        window.location.replace("/jobs")
       } else {
         openSnackbar(" Please enter a correct password");
       }
