@@ -64,7 +64,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const LOCAL_STORAGE = JSON.parse(localStorage.getItem("userData"));
-console.log(LOCAL_STORAGE.role);
 function Sidebar(props) {
   const NAME = LOCAL_STORAGE.firstName;
   // if (JSON.parse(localStorage.getItem("userData")) !== null) {
@@ -96,7 +95,7 @@ function Sidebar(props) {
           <ListItemText primary={"Jobs"} style={{ color: "#262626" }} />
         </ListItem>
       </List>
-      {LOCAL_STORAGE.role === 0 ? (
+      {LOCAL_STORAGE !== null && LOCAL_STORAGE.role === 0 ? (
         <>
           <Divider />
           <List>
