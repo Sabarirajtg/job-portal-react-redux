@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const JOB_API_URL = `http://localhost:4000/jobs`;
+const JOB_API_URL = `https://job-portal-server-cdmrt.herokuapp.com/jobs`;
 
 const headers = {
   headers: {
