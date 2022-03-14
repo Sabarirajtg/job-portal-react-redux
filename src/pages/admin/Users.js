@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
@@ -8,6 +8,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { useSelector, useDispatch } from "react-redux";
 import { changeRole } from "../../redux/actions";
+import User from "../../services/User";
 import { useSnackbar } from "react-simple-snackbar";
 
 const drawerWidth = 240;
@@ -48,18 +49,30 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Users() {
   const LOCAL_STORAGE = JSON.parse(localStorage.getItem("userData"));
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [openSnackbar] = useSnackbar();
 
-  const users = useSelector((state) => state.userReducer);
+  // const users = useSelector((state) => state.userReducer);
+
+  useEffect(() => {
+    User.getAllUsers().then((res) => {
+      setUsers(res.data.data);
+    });
+  }, []);
+
   console.log(users);
   const classes = useStyles();
 
   function handleRole(id, role) {
-    if (LOCAL_STORAGE.id === id) {
+    if (LOCAL_STORAGE._id === id) {
       openSnackbar("You can't change your own Role!");
     } else {
-      dispatch(changeRole(id, role));
+      User.modifyUser(id, { role: role }).then((res) => {
+        setUsers(res.data.data);
+      });
+      openSnackbar("success");
+      // console.log()
     }
   }
 
@@ -108,7 +121,7 @@ export default function Users() {
                     size="small"
                     style={{ color: "red" }}
                     variant="outlined"
-                    onClick={() => handleRole(user.id, 1)}
+                    onClick={() => handleRole(user._id, 1)}
                   >
                     Degrade role
                   </Button>
@@ -120,7 +133,7 @@ export default function Users() {
                   size="small"
                   style={{ color: "green" }}
                   variant="outlined"
-                  onClick={() => handleRole(user.id, 0)}
+                  onClick={() => handleRole(user._id, 0)}
                 >
                   Make Admin
                 </Button>

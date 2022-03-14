@@ -11,6 +11,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React from "react";
 import { useSelector } from "react-redux";
 import { useSnackbar } from "react-simple-snackbar";
+import User from "../services/User";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -55,32 +56,31 @@ export default function Login() {
 
     const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
-    let userData = {
-      email: data.get("email"),
-      password: data.get("password"),
-    };
-    const index = users.findIndex((user) => user.email === userData.email);
-    if (index === -1) {
-      openSnackbar("Email or Password Wrong");
-    } else {
-      if (users[index].password === userData.password) {
-        localStorage.setItem("userData",JSON.stringify(users[index]))
-        window.location.replace("/jobs")
-      } else {
-        openSnackbar(" Please enter a correct password");
-      }
-    }
-    console.log(index);
-
-    console.log(userData);
-
-    // if (loginData.data.success) {
-    //   localStorage.setItem("isLoggedIn", true);
-    //   window.location.replace("/home");
-    //   localStorage.setItem("userId", loginData.data.user._id);
+    // let userData = {
+    //   email: data.get("email"),
+    //   password: data.get("password"),
+    // };
+    // const index = users.findIndex((user) => user.email === userData.email);
+    // if (index === -1) {
+    //   openSnackbar("Email or Password Wrong");
     // } else {
-    //   console.log(loginData.data.msg);
+    //   if (users[index].password === userData.password) {
+    //     localStorage.setItem("userData", JSON.stringify(users[index]));
+    //     window.location.replace("/jobs");
+    //   } else {
+    //     openSnackbar(" Please enter a correct password");
+    //   }
     // }
+
+    const loginData = await User.login(data.get("email"), data.get("password"));
+
+    if (loginData.data.success) {
+      localStorage.setItem("token", loginData.data.token);
+      window.location.replace("/jobs");
+      localStorage.setItem("userData", JSON.stringify(loginData.data.user));
+    } else {
+      console.log(loginData.data.msg);
+    }
   };
 
   const classes = useStyles();

@@ -5,11 +5,12 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { deleteJob } from "../../redux/actions";
+import Job from "../../services/Job";
 
 const drawerWidth = 240;
 
@@ -60,15 +61,23 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Jobs() {
   const navigate = useNavigate();
-  const jobs = useSelector((state) => state.jobReducer);
-  const user = useSelector((state) => state.userReducer);
-  console.log(user);
+  const [jobs, setJobs] = useState([]);
+  // const jobs = useSelector((state) => state.jobReducer);
+  // const user = useSelector((state) => state.userReducer);
+  // console.log(user);
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
   const classes = useStyles();
 
-  function handleDelete(jobId) {
-    dispatch(deleteJob(jobId));
+  useEffect(() => {
+    Job.getAllJob().then((res) => setJobs(res.data.data));
+  }, []);
+
+  console.log(jobs);
+
+  async function handleDelete(jobId) {
+    await Job.deleteJob(jobId).then((res) => window.location.reload());
+    // console.log(res.data);
   }
 
   return (
@@ -109,7 +118,7 @@ export default function Jobs() {
                     gutterBottom
                   ></Typography>
                   <Typography variant="h5" component="h2">
-                    Job Name: {job.jobName}
+                    Job Name: {job.name}
                   </Typography>
                   <Typography className={classes.pos} color="textSecondary">
                     {job.type}
@@ -149,7 +158,7 @@ export default function Jobs() {
                         color="primary"
                         size="small"
                         variant="contained"
-                        onClick={() => handleDelete(job.id)}
+                        onClick={() => handleDelete(job._id)}
                       >
                         Delete Job
                       </Button>

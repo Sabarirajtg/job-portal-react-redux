@@ -6,11 +6,12 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import Sidebar from "../../components/Sidebar";
 import { handleApplicantStatus } from "../../redux/actions";
+import Job from "../../services/Job";
 
 const drawerWidth = 240;
 
@@ -55,34 +56,34 @@ const useStyles = makeStyles((theme) => ({
 export default function ViewApplicants() {
   const classes = useStyles();
   const location = useLocation();
+  const [jobs, setJobs] = useState();
   const dispatch = useDispatch();
-  const jobs = useSelector((state) => state.jobReducer);
+  // const jobs = useSelector((state) => state.jobReducer);
   console.log(location);
-  const jobIndex = jobs.findIndex(
-    (job) => job.id === location.state.jobData.id
-  );
+  // const jobIndex = jobs.findIndex(
+  //   (job) => job.id === location.state.jobData.id
+  // );
+
+  useEffect(() => {
+    Job.getJob(location.state.jobData._id).then((res) => {
+      setJobs(res.data.data);
+    });
+  }, []);
+
+  console.log(jobs);
 
   function handleStatus(jobId, applicantId, status, action) {
     if (window.confirm("Do yo want to " + action + " the applicant?")) {
-      dispatch(handleApplicantStatus(jobId, applicantId, status));
+      // dispatch(handleApplicantStatus(jobId, applicantId, status));
+      Job.updateApplicant(jobId, { _id: applicantId, status: status }).then(
+        (res) => {
+          setJobs(res.data.data);
+          // console.log(res.data.data);
+        }
+      );
       console.log(jobId, applicantId, status);
-      //   const newState = [...jobs];
-      //   const index = newState.findIndex((job) => job.id === jobId);
-      //   console.log(index);
-      //   const applicants = [...newState[index].applicants];
-      //   console.log(applicants);
-      //   const applicantIndex = applicants.findIndex(
-      //     (application) => application.id === applicantId
-      //   );
-      //   console.log(applicantIndex);
-      //   if (applicantIndex !== -1)
-      //     newState[index].applicants[applicantIndex].status = status;
-      //   console.log(newState);
-      // }
     }
   }
-
-  // const userData = [JSON.parse(localStorage.getItem("userData"))];
 
   if (JSON.parse(localStorage.getItem("userData")).role === 1) {
     return (
@@ -116,7 +117,7 @@ export default function ViewApplicants() {
               gutterBottom
             ></Typography>
             <Typography variant="h6" component="h2">
-              Job Name: {location.state.jobData.jobName}
+              Job Name: {location.state.jobData.name}
             </Typography>
             <br />
             <Typography variant="h6" component="h2">
@@ -133,21 +134,21 @@ export default function ViewApplicants() {
           </CardContent>
         </Card>
         <Card className={classes.root} variant="outlined">
-          {jobs[jobIndex].applicants.map((job) => (
-            <>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h6" component="h2">
-                    {/* {job.id && job.id} */}
-                  </Typography>
-                  <Typography variant="h6" component="h2">
-                    Applicant Name:
-                    {job.firstName && job.firstName + job.lastName}
-                  </Typography>
-                  <Typography className={classes.pos} color="textSecondary">
-                    Email: {job.email && job.email}
-                  </Typography>
-                  {jobIndex !== -1 ? (
+          {jobs &&
+            jobs.applicants.map((job) => (
+              <>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="h6" component="h2">
+                      {/* {job._id && job._id} */}
+                    </Typography>
+                    <Typography variant="h6" component="h2">
+                      Applicant Name:
+                      {job.firstName && job.firstName + job.lastName}
+                    </Typography>
+                    <Typography className={classes.pos} color="textSecondary">
+                      Email: {job.email && job.email}
+                    </Typography>
                     <Typography variant="body2" component="p">
                       {job.status === "pending" ? (
                         <h3
@@ -155,7 +156,7 @@ export default function ViewApplicants() {
                         >
                           Pending
                         </h3>
-                      ) : job.status === "Approved" ? (
+                      ) : job.status === "approved" ? (
                         <h3 style={{ color: "green", textAlign: "center" }}>
                           Accepted
                         </h3>
@@ -165,45 +166,43 @@ export default function ViewApplicants() {
                         </h3>
                       )}
                     </Typography>
-                  ) : (
-                    <></>
-                  )}
-                  <CardActions style={{ marginLeft: "27px" }}>
-                    <Button
-                      color="primary"
-                      size="small"
-                      variant="contained"
-                      onClick={() =>
-                        handleStatus(
-                          location.state.jobData.id,
-                          job.id,
-                          "Approved",
-                          "approve"
-                        )
-                      }
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      color="primary"
-                      size="small"
-                      variant="contained"
-                      onClick={() =>
-                        handleStatus(
-                          location.state.jobData.id,
-                          job.id,
-                          "Rejected",
-                          "reject"
-                        )
-                      }
-                    >
-                      Reject
-                    </Button>
-                  </CardActions>
-                </CardContent>
-              </Card>
-            </>
-          ))}
+
+                    <CardActions style={{ marginLeft: "27px" }}>
+                      <Button
+                        color="primary"
+                        size="small"
+                        variant="contained"
+                        onClick={() =>
+                          handleStatus(
+                            location.state.jobData._id,
+                            job._id,
+                            "approved",
+                            "approve"
+                          )
+                        }
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        color="primary"
+                        size="small"
+                        variant="contained"
+                        onClick={() =>
+                          handleStatus(
+                            location.state.jobData._id,
+                            job._id,
+                            "rejected",
+                            "reject"
+                          )
+                        }
+                      >
+                        Reject
+                      </Button>
+                    </CardActions>
+                  </CardContent>
+                </Card>
+              </>
+            ))}
         </Card>
       </main>
     </>

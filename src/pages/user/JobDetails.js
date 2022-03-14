@@ -6,12 +6,13 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import { useSnackbar } from "react-simple-snackbar";
 import Sidebar from "../../components/Sidebar";
 import { addApplicant } from "../../redux/actions";
+import Job from "../../services/Job";
 
 const drawerWidth = 240;
 
@@ -57,34 +58,55 @@ export default function JobDetails() {
   const classes = useStyles();
   const location = useLocation();
   const [openSnackbar] = useSnackbar();
+  const [status, setStatus] = useState("");
   const dispatch = useDispatch();
   const jobs = useSelector((state) => state.jobReducer);
 
   console.log(location);
-  const userData = [JSON.parse(localStorage.getItem("userData"))];
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
-  const index = jobs.findIndex((job) => job.id === location.state.jobData.id);
-  const applicantIndex = jobs[index].applicants.findIndex(
-    (application) => application.id === userData[0].id
-  );
-  console.log(applicantIndex);
-  function applyJob(jobId, applicantId, firstName, lastName, email) {
-    if (applicantIndex === -1) {
-      if (window.confirm("Do you want to apply for this role?")) {
-        dispatch(addApplicant(jobId, applicantId, firstName, lastName, email));
-      }
-    } else {
-      openSnackbar("You already applied for this job");
-    }
+  useEffect(() => {
+    Job.userJobStatus(location.state.jobData._id, userData._id).then((res) => {
+      setStatus(res.data.status);
+    });
+  }, []);
 
-    // console.log(jobId, applicantId, firstName, lastName, email);
-  }
-
-  const status = userData.findIndex(
-    (data) => data.id === location.state.jobData.id
-  );
   console.log(status);
 
+  function applyJob(jobId, applicantId, firstName, lastName, email) {
+    if (window.confirm("Do you want to apply for this role?")) {
+      Job.addApplicant(jobId, {
+        _id: applicantId,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+      }).then((res) => {
+        console.log(res.data.data);
+      });
+    }
+  }
+
+  // const index = jobs.findIndex((job) => job.id === location.state.jobData.id);
+  // const applicantIndex = jobs[index].applicants.findIndex(
+  //   (application) => application.id === userData[0].id
+  // );
+  // console.log(applicantIndex);
+  // function applyJob(jobId, applicantId, firstName, lastName, email) {
+  //   if (applicantIndex === -1) {
+  //     if (window.confirm("Do you want to apply for this role?")) {
+  //       dispatch(addApplicant(jobId, applicantId, firstName, lastName, email));
+  //     }
+  //   } else {
+  //     openSnackbar("You already applied for this job");
+  //   }
+
+  // console.log(jobId, applicantId, firstName, lastName, email);
+  // }
+
+  // const status = userData.findIndex(
+  //   (data) => data.id === location.state.jobData.id
+  // );
+  // console.log(status);
   return (
     <>
       <Sidebar />
@@ -98,7 +120,7 @@ export default function JobDetails() {
               gutterBottom
             ></Typography>
             <Typography variant="h6" component="h2">
-              Job Name: {location.state.jobData.jobName}
+              Job Name: {location.state.jobData.name}
             </Typography>
             <br />
             <Typography variant="h6" component="h2">
@@ -113,23 +135,34 @@ export default function JobDetails() {
               Updated on: {location.state.jobData.date}
             </Typography>
           </CardContent>
-          <CardActions>
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={() =>
-                applyJob(
-                  location.state.jobData.id,
-                  userData[0].id,
-                  userData[0].firstName,
-                  userData[0].lastName,
-                  userData[0].email
-                )
-              }
-            >
-              Apply
-            </Button>
-          </CardActions>
+          {status === "Not applied for this job yet" ? (
+            <CardActions>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={() =>
+                  applyJob(
+                    location.state.jobData._id,
+                    userData._id,
+                    userData.firstName,
+                    userData.lastName,
+                    userData.email
+                  )
+                }
+              >
+                Apply
+              </Button>
+            </CardActions>
+          ) : (
+            <CardContent>
+              <Typography
+                style={{ color: "green", textAlign: "center" }}
+                variant="h6"
+              >
+                You already applied this job
+              </Typography>
+            </CardContent>
+          )}
         </Card>
         <Card className={classes.root} variant="outlined">
           <CardContent>
@@ -145,28 +178,24 @@ export default function JobDetails() {
               className={classes.pos}
               color="textSecondary"
             ></Typography>
-            {location.state.jobData.applicants.length > 0 &&
-            location.state.jobData.applicants[applicantIndex] ? (
-              <Typography variant="body2" component="p">
-                {location.state.jobData.applicants[applicantIndex].status ===
-                "pending" ? (
-                  <h3 style={{ color: "yellowgreen", textAlign: "center" }}>
-                    Pending
-                  </h3>
-                ) : location.state.jobData.applicants[applicantIndex].status ===
-                  "Approved" ? (
-                  <h3 style={{ color: "green", textAlign: "center" }}>
-                    Approved
-                  </h3>
-                ) : (
-                  <h3 style={{ color: "orange", textAlign: "center" }}>
-                    Rejected
-                  </h3>
-                )}
-              </Typography>
-            ) : (
-              <h3>You did not applied for this job yet</h3>
-            )}
+
+            <Typography variant="body2" component="p">
+              {status === "pending" ? (
+                <h3 style={{ color: "yellowgreen", textAlign: "center" }}>
+                  Pending
+                </h3>
+              ) : status === "approved" ? (
+                <h3 style={{ color: "green", textAlign: "center" }}>
+                  Approved
+                </h3>
+              ) : status === "rejected" ? (
+                <h3 style={{ color: "orange", textAlign: "center" }}>
+                  Rejected
+                </h3>
+              ) : (
+                <h3>{status}</h3>
+              )}
+            </Typography>
           </CardContent>
         </Card>
       </main>

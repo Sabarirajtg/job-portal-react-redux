@@ -13,6 +13,7 @@ import Sidebar from "../../components/Sidebar";
 import { v4 as uuid } from "uuid";
 import { useLocation } from "react-router-dom";
 import { useSnackbar } from "react-simple-snackbar";
+import Job from "../../services/Job";
 
 const drawerWidth = 240;
 
@@ -65,19 +66,25 @@ export default function AddJob() {
 
   useEffect(() => {
     if (location.state !== null) {
-      setId(location.state.jobData.id);
-      setJobName(location.state.jobData.jobName);
+      setId(location.state.jobData._id);
+      setJobName(location.state.jobData.name);
       setType(location.state.jobData.type);
       setDescription(location.state.jobData.description);
     }
   }, []);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (location.state !== null)
-      dispatch(modifyJob(id, jobName, type, description));
-    else dispatch(addJob(uuid(), jobName, type, description));
-    openSnackbar("Submitted");
+    const jobData = { name: jobName, type: type, description: description };
+
+    if (location.state !== null) {
+      // dispatch(modifyJob(id, jobName, type, description));
+      Job.modifyJob(id, jobData);
+      openSnackbar("Submitted");
+    } else {
+      Job.addJob(jobData);
+      openSnackbar("Submitted");
+    }
   };
   const classes = useStyles();
 

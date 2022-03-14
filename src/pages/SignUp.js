@@ -13,8 +13,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addUser } from "../redux/actions";
-import { v4 as uuid } from "uuid";
+import User from "../services/User";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -44,21 +43,31 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    dispatch(
-      addUser(
-        uuid(),
-        data.get("firstName"),
-        data.get("lastName"),
-        data.get("email"),
-        data.get("password")
-      )
-    ).then(navigate("/"));
-    // User.addUser(userData).then((res) => {
-    //   if (res.data.success) {
-    //     alert("Thank you!");
-    //     window.location.replace("/");
-    //   }
-    // });
+    let userData = {
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
+      email: data.get("email"),
+      password: data.get("password"),
+    };
+
+    User.addUser(userData).then((res) => {
+      if (res.data.success) {
+        alert(res.data.msg);
+        window.location.replace("/");
+      } else {
+        alert(res.data.msg);
+      }
+    });
+
+    // dispatch(
+    //   addUser(
+    //     uuid(),
+    //     data.get("firstName"),
+    //     data.get("lastName"),
+    //     data.get("email"),
+    //     data.get("password")
+    //   )
+    // ).then(navigate("/"));
   };
   const classes = useStyles();
 

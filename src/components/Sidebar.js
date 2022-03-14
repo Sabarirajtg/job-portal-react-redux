@@ -149,6 +149,7 @@ function Sidebar(props) {
             color="inherit"
             onClick={() => {
               localStorage.removeItem("userData");
+              localStorage.removeItem("token");
               navigate("/");
             }}
           >
