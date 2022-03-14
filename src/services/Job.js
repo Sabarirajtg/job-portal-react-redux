@@ -13,6 +13,7 @@ class Job {
   getAllJob() {
     return axios.get(JOB_API_URL, headers);
   }
+  
 
   getJob(id) {
     return axios.get(JOB_API_URL + "/" + id, headers);
