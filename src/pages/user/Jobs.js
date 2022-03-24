@@ -1,4 +1,12 @@
-import { Box, TextField } from "@material-ui/core";
+import {
+  Box,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -47,10 +55,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   box: {
-    paddingTop: theme.spacing(5),
-    paddingLeft: theme.spacing(60),
-    maxWidth: 1200,
-    color: "black",
+    marginLeft: "30rem",
     "@media (max-width: 780px)": {
       padding: theme.spacing(0),
       marginLeft: theme.spacing(0),
@@ -66,11 +71,20 @@ export default function Jobs() {
   // const user = useSelector((state) => state.userReducer);
   // console.log(user);
   const [search, setSearch] = useState("");
+  const [type, setType] = useState("jobType");
   const dispatch = useDispatch();
   const classes = useStyles();
 
+  const LOCAL_STORAGE = JSON.parse(localStorage.getItem("userData"));
+
   useEffect(() => {
-    Job.getAllJob().then((res) => setJobs(res.data.data));
+    if (LOCAL_STORAGE.role === 2) {
+      Job.getJobsByCompany(LOCAL_STORAGE.companyId).then((res) =>
+        setJobs(res.data.data)
+      );
+    } else {
+      Job.getAllJob().then((res) => setJobs(res.data.data));
+    }
   }, []);
 
   console.log(jobs);
@@ -84,15 +98,49 @@ export default function Jobs() {
     <>
       <Sidebar />
       <Box>
-        <TextField
-          className={classes.box}
-          required
-          id="outlined-required"
-          fullWidth
-          onChange={(e) => setSearch(e.target.value)}
-          defaultValue="Search...."
-          variant="outlined"
-        />
+        <Typography component="div">
+          <Box
+            textAlign="center"
+            style={{ marginLeft: "14rem" }}
+            fontWeight="fontWeightBold"
+            m={1}
+          >
+            Filter
+          </Box>
+        </Typography>
+        <Grid container spacing={3} className={classes.box}>
+          <Grid item xs={12} sm={3}>
+            <FormControl variant="outlined" fullWidth>
+              <InputLabel id="demo-simple-select-outlined-label">
+                Company
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                onChange={(e) => setType(e.target.value)}
+                value={type}
+                displayEmpty
+                name="company"
+                label="Company"
+              >
+                <MenuItem value="jobType" selected="selected">
+                  Job Type
+                </MenuItem>
+                <MenuItem value="company">Company</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>{" "}
+          <Grid item xs={12} sm={3}>
+            <TextField
+              required
+              id="outlined-required"
+              fullWidth
+              onChange={(e) => setSearch(e.target.value)}
+              defaultValue="Search...."
+              variant="outlined"
+            />
+          </Grid>
+        </Grid>
       </Box>
       <main className={classes.content}>
         <div className={classes.toolbar} />
@@ -102,7 +150,15 @@ export default function Jobs() {
             .filter((data) => {
               if (search == null) return data;
               else {
-                if (data.type.toLowerCase().includes(search.toLowerCase())) {
+                if (
+                  type === "jobType" &&
+                  data.type.toLowerCase().includes(search.toLowerCase())
+                ) {
+                  return data;
+                } else if (
+                  type === "company" &&
+                  data.companyId.name.toLowerCase().includes(search.toLowerCase())
+                ) {
                   return data;
                 } else {
                   return null;
@@ -123,11 +179,18 @@ export default function Jobs() {
                   <Typography className={classes.pos} color="textSecondary">
                     {job.type}
                   </Typography>
+                  <Typography variant="body4" component="h2">
+                    {job.companyId.name},
+                  </Typography>
+                  <Typography variant="body1" component="h3">
+                    {job.companyId.address}
+                  </Typography>
+                  <br />
                   <Typography variant="body2" component="p">
                     {job.description}
                   </Typography>
                 </CardContent>
-                {JSON.parse(localStorage.getItem("userData")).role === 0 ? (
+                {LOCAL_STORAGE.role === 2 ? (
                   <>
                     <CardActions>
                       <Button
@@ -164,6 +227,26 @@ export default function Jobs() {
                       </Button>
                     </CardActions>
                   </>
+                ) : LOCAL_STORAGE.role === 0 ? (
+                  <CardActions>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() =>
+                        navigate("/addcompany", {
+                          state: {
+                            companyData: {
+                              _id: job.companyId._id,
+                              name: job.companyId.name,
+                              address: job.companyId.address,
+                            },
+                          },
+                        })
+                      }
+                    >
+                      Edit Company
+                    </Button>
+                  </CardActions>
                 ) : (
                   <CardActions>
                     <Button

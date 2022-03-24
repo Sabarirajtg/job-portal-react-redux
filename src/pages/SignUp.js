@@ -10,10 +10,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import User from "../services/User";
+import Company from "../services/Company";
+import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -38,17 +40,31 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUp() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [companies, setCompanies] = useState([]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    let userData = {};
+    if (url === "/companysignup") {
+      userData = {
+        firstName: data.get("firstName"),
+        lastName: data.get("lastName"),
+        email: data.get("email"),
+        password: data.get("password"),
+        companyId: data.get("company"),
+        role: 2,
+      };
+    } else {
+      userData = {
+        firstName: data.get("firstName"),
+        lastName: data.get("lastName"),
+        email: data.get("email"),
+        password: data.get("password"),
+      };
+    }
 
-    let userData = {
-      firstName: data.get("firstName"),
-      lastName: data.get("lastName"),
-      email: data.get("email"),
-      password: data.get("password"),
-    };
+    console.log(userData);
 
     User.addUser(userData).then((res) => {
       if (res.data.success) {
@@ -70,6 +86,15 @@ export default function SignUp() {
     // ).then(navigate("/"));
   };
   const classes = useStyles();
+  let url = new URL(window.location.href).pathname;
+  if (url) {
+    console.log(url);
+  }
+
+  useEffect(() => {
+    Company.getAllCompanies().then((res) => setCompanies(res.data.data));
+  }, []);
+  console.log(companies);
 
   return (
     <Container component="main" maxWidth="xs">
@@ -128,6 +153,37 @@ export default function SignUp() {
                 id="password"
                 autoComplete="current-password"
               />
+            </Grid>
+            <Grid item xs={12}>
+              {url === "/companysignup" ? (
+                <FormControl
+                  variant="outlined"
+                  className={classes.formControl}
+                  fullWidth
+                >
+                  <InputLabel id="demo-simple-select-outlined-label">
+                    Company
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="demo-simple-select-outlined"
+                    // onChange={handleChange}
+                    name="company"
+                    label="Company"
+                  >
+                    <MenuItem value="None">
+                      <em>None</em>
+                    </MenuItem>
+                    {companies.map((company) => (
+                      <MenuItem key={company.id} value={company._id}>
+                        {company.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
+                <> </>
+              )}
             </Grid>
             <Grid item xs={12}>
               <FormControlLabel

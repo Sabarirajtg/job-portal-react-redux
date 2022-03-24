@@ -12,10 +12,10 @@ import ListItemText from "@material-ui/core/ListItemText";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import { Add, Person, Work } from "@material-ui/icons";
+import { Add, Apartment, Business, Person, Work } from "@material-ui/icons";
 import MenuIcon from "@material-ui/icons/Menu";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 
 const drawerWidth = 220;
 
@@ -69,6 +69,11 @@ function Sidebar(props) {
   // if (JSON.parse(localStorage.getItem("userData")) !== null) {
   //   navigate("/jobs");
   // }
+
+  // if (LOCAL_STORAGE !== null) {
+  //   return <Navigate to="/" replace={true} />
+  // }
+
   const { window } = props;
   const classes = useStyles();
   const navigate = useNavigate();
@@ -99,15 +104,6 @@ function Sidebar(props) {
         <>
           <Divider />
           <List>
-            <ListItem button component={Link} href="/addjob">
-              <ListItemIcon>
-                <Add />
-              </ListItemIcon>
-              <ListItemText primary={"Add Job"} style={{ color: "#262626" }} />
-            </ListItem>
-          </List>
-          <Divider />
-          <List>
             <ListItem button component={Link} href="/users">
               <ListItemIcon>
                 <Person />
@@ -118,6 +114,46 @@ function Sidebar(props) {
               />
             </ListItem>
           </List>
+          <Divider />
+          <List>
+            <ListItem button component={Link} href="/companies">
+              <ListItemIcon>
+                <Apartment />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Companies"}
+                style={{ color: "#262626" }}
+              />
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
+            <ListItem button component={Link} href="/addcompany">
+              <ListItemIcon>
+                <Business />
+              </ListItemIcon>
+              <ListItemText
+                primary={"Add Company"}
+                style={{ color: "#262626" }}
+              />
+            </ListItem>
+          </List>
+        </>
+      ) : (
+        <></>
+      )}
+      {LOCAL_STORAGE !== null && LOCAL_STORAGE.role === 2 ? (
+        <>
+          <Divider />
+          <List>
+            <ListItem button component={Link} href="/addjob">
+              <ListItemIcon>
+                <Add />
+              </ListItemIcon>
+              <ListItemText primary={"Add Job"} style={{ color: "#262626" }} />
+            </ListItem>
+          </List>
+          <Divider />
         </>
       ) : (
         <></>

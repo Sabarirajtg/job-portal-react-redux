@@ -5,9 +5,11 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import AddJob from "../pages/admin/AddJob";
+import AddCompany from "../pages/admin/AddCompany";
+import AddJob from "../pages/company/AddJob";
+import Companies from "../pages/admin/Companies";
 import Home from "../pages/admin/Home";
-import ViewApplicants from "../pages/admin/ViewApplicants";
+import ViewApplicants from "../pages/company/ViewApplicants";
 import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import JobDetails from "../pages/user/JobDetails";
@@ -33,18 +35,21 @@ export default function User() {
             element={<Login />}
             render={() => {
               localStorage.getItem("userData") === null ? (
-                <Navigate to="/" />
+                <Navigate replace to="/" />
               ) : (
-                <Navigate to="/home" />
+                <Navigate replace to="/home" />
               );
             }}
           />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/companysignup" element={<SignUp />} />
           <Route path="/home" element={<Home />} />
           <Route path="/addjob" element={<AddJob />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobdetails" element={<JobDetails />} />
           <Route path="/viewapplicants" element={<ViewApplicants />} />
+          <Route path="/addcompany" element={<AddCompany />} />
+          <Route path="/companies" element={<Companies />} />
         </Routes>
       </Router>
     </>

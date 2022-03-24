@@ -75,7 +75,14 @@ export default function AddJob() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const jobData = { name: jobName, type: type, description: description };
+    const jobData = {
+      name: jobName,
+      type: type,
+      description: description,
+      companyId: JSON.parse(localStorage.getItem("userData")).companyId,
+    };
+
+    console.log(jobData);
 
     if (location.state !== null) {
       // dispatch(modifyJob(id, jobName, type, description));
@@ -88,7 +95,7 @@ export default function AddJob() {
   };
   const classes = useStyles();
 
-  if (JSON.parse(localStorage.getItem("userData")).role === 1) {
+  if (JSON.parse(localStorage.getItem("userData")).role !== 2) {
     return (
       <>
         <Sidebar />

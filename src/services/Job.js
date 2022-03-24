@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const JOB_API_URL = `https://job-portal-server-cdmrt.herokuapp.com/jobs`;
+const URL = "http://localhost:4000/jobs";
 
 const headers = {
   headers: {
@@ -11,41 +11,44 @@ const headers = {
 
 class Job {
   getAllJob() {
-    return axios.get(JOB_API_URL, headers);
+    return axios.get(URL, headers);
   }
-  
+
+  getJobsByCompany(id) {
+    return axios.get(URL + "/jobsbycompany/" + id, headers);
+  }
 
   getJob(id) {
-    return axios.get(JOB_API_URL + "/" + id, headers);
+    return axios.get(URL + "/" + id, headers);
   }
 
   addJob(data) {
-    return axios.post(JOB_API_URL, data, headers);
+    return axios.post(URL, data, headers);
   }
 
   deleteJob(id) {
-    return axios.delete(JOB_API_URL + "/" + id, headers);
+    return axios.delete(URL + "/" + id, headers);
   }
 
   // updateJob(id, data) {
-  //   return axios.put(JOB_API_URL + "/" + id, data);
+  //   return axios.put(URL + "/" + id, data);
   // }
 
   addApplicant(jobId, data) {
-    return axios.post(JOB_API_URL + "/addapplicant/" + jobId, data, headers);
+    return axios.post(URL + "/addapplicant/" + jobId, data, headers);
   }
 
   modifyJob(jobId, data) {
-    return axios.put(JOB_API_URL + "/" + jobId, data, headers);
+    return axios.put(URL + "/" + jobId, data, headers);
   }
 
   updateApplicant(jobId, data) {
-    return axios.put(JOB_API_URL + "/updateapplicant/" + jobId, data, headers);
+    return axios.put(URL + "/updateapplicant/" + jobId, data, headers);
   }
 
   userJobStatus(jobId, applicantId) {
     return axios.get(
-      JOB_API_URL + "/" + jobId + "/userjobstatus/" + applicantId,
+      URL + "/" + jobId + "/userjobstatus/" + applicantId,
       headers
     );
   }

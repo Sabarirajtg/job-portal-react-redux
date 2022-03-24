@@ -35,9 +35,7 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
   },
   content: {
-    display: "flex",
     flexGrow: 1,
-    paddingTop: theme.spacing(10),
     paddingLeft: theme.spacing(33),
     "@media (max-width: 780px)": {
       padding: theme.spacing(0),

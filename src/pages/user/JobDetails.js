@@ -12,6 +12,7 @@ import { useLocation } from "react-router";
 import { useSnackbar } from "react-simple-snackbar";
 import Sidebar from "../../components/Sidebar";
 import { addApplicant } from "../../redux/actions";
+import Applicant from "../../services/Applicant";
 import Job from "../../services/Job";
 
 const drawerWidth = 240;
@@ -58,7 +59,7 @@ export default function JobDetails() {
   const classes = useStyles();
   const location = useLocation();
   const [openSnackbar] = useSnackbar();
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState();
   const dispatch = useDispatch();
   const jobs = useSelector((state) => state.jobReducer);
 
@@ -66,22 +67,25 @@ export default function JobDetails() {
   const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
-    Job.userJobStatus(location.state.jobData._id, userData._id).then((res) => {
-      setStatus(res.data.status);
-    });
+    Applicant.getApplicant(location.state.jobData._id, userData._id).then(
+      (res) => {
+        setStatus(res.data.data[0].status);
+      }
+    );
   }, []);
 
   console.log(status);
 
-  function applyJob(jobId, applicantId, firstName, lastName, email) {
+  function applyJob(jobId, applicantId, companyId) {
+    console.log(jobId, applicantId, companyId);
     if (window.confirm("Do you want to apply for this role?")) {
-      Job.addApplicant(jobId, {
-        _id: applicantId,
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
+      Applicant.addApplicant({
+        jobId,
+        applicantId,
+        companyId,
       }).then((res) => {
         console.log(res.data.data);
+        setStatus(res.data.data.status);
       });
     }
   }
@@ -112,7 +116,11 @@ export default function JobDetails() {
       <Sidebar />
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <Card className={classes.root} variant="outlined">
+        <Card
+          className={classes.root}
+          variant="outlined"
+          style={{ maxWidth: "30%" }}
+        >
           <CardContent>
             <Typography
               className={classes.title}
@@ -135,7 +143,7 @@ export default function JobDetails() {
               Updated on: {location.state.jobData.date}
             </Typography>
           </CardContent>
-          {status === "Not applied for this job yet" ? (
+          {status === undefined ? (
             <CardActions>
               <Button
                 color="primary"
@@ -144,9 +152,7 @@ export default function JobDetails() {
                   applyJob(
                     location.state.jobData._id,
                     userData._id,
-                    userData.firstName,
-                    userData.lastName,
-                    userData.email
+                    location.state.jobData.companyId._id
                   )
                 }
               >

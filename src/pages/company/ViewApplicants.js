@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import Sidebar from "../../components/Sidebar";
 import { handleApplicantStatus } from "../../redux/actions";
+import Applicant from "../../services/Applicant";
 import Job from "../../services/Job";
 
 const drawerWidth = 240;
@@ -58,6 +59,7 @@ export default function ViewApplicants() {
   const location = useLocation();
   const [jobs, setJobs] = useState();
   const dispatch = useDispatch();
+  const [applicants, setApplicants] = useState([]);
   // const jobs = useSelector((state) => state.jobReducer);
   console.log(location);
   // const jobIndex = jobs.findIndex(
@@ -68,20 +70,23 @@ export default function ViewApplicants() {
     Job.getJob(location.state.jobData._id).then((res) => {
       setJobs(res.data.data);
     });
-  }, []);
+    Applicant.getApplicantsByJob(location.state.jobData._id).then((res) => {
+      setApplicants(res.data.data);
+    });
+  }, [jobs]);
 
-  console.log(jobs);
+  console.log(applicants);
 
-  function handleStatus(jobId, applicantId, status, action) {
+  function handleStatus(jobId, status, action) {
     if (window.confirm("Do yo want to " + action + " the applicant?")) {
       // dispatch(handleApplicantStatus(jobId, applicantId, status));
-      Job.updateApplicant(jobId, { _id: applicantId, status: status }).then(
-        (res) => {
-          setJobs(res.data.data);
-          // console.log(res.data.data);
-        }
-      );
-      console.log(jobId, applicantId, status);
+      Applicant.updateApplicant(jobId, {
+        status: status,
+      }).then((res) => {
+        setJobs(res.data.data);
+        // console.log(res.data.data);
+      });
+      console.log(jobId, status);
     }
   }
 
@@ -134,29 +139,34 @@ export default function ViewApplicants() {
           </CardContent>
         </Card>
         <Card className={classes.root} variant="outlined">
-          {jobs &&
-            jobs.applicants.map((job) => (
+          {applicants &&
+            applicants.map((applicant) => (
               <>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="h6" component="h2">
-                      {/* {job._id && job._id} */}
+                      {/* {applicant._id && applicant._id} */}
                     </Typography>
                     <Typography variant="h6" component="h2">
                       Applicant Name:
-                      {job.firstName && job.firstName + job.lastName}
+                      {applicant.applicantId.firstName &&
+                        applicant.applicantId.firstName +
+                          " " +
+                          applicant.applicantId.lastName}
                     </Typography>
                     <Typography className={classes.pos} color="textSecondary">
-                      Email: {job.email && job.email}
+                      Email:{" "}
+                      {applicant.applicantId.email &&
+                        applicant.applicantId.email}
                     </Typography>
                     <Typography variant="body2" component="p">
-                      {job.status === "pending" ? (
+                      {applicant.status === "pending" ? (
                         <h3
                           style={{ color: "yellowgreen", textAlign: "center" }}
                         >
                           Pending
                         </h3>
-                      ) : job.status === "approved" ? (
+                      ) : applicant.status === "approved" ? (
                         <h3 style={{ color: "green", textAlign: "center" }}>
                           Accepted
                         </h3>
@@ -173,12 +183,7 @@ export default function ViewApplicants() {
                         size="small"
                         variant="contained"
                         onClick={() =>
-                          handleStatus(
-                            location.state.jobData._id,
-                            job._id,
-                            "approved",
-                            "approve"
-                          )
+                          handleStatus(applicant._id, "approved", "approve")
                         }
                       >
                         Approve
@@ -188,12 +193,7 @@ export default function ViewApplicants() {
                         size="small"
                         variant="contained"
                         onClick={() =>
-                          handleStatus(
-                            location.state.jobData._id,
-                            job._id,
-                            "rejected",
-                            "reject"
-                          )
+                          handleStatus(applicant._id, "rejected", "reject")
                         }
                       >
                         Reject
