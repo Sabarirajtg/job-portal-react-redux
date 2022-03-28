@@ -22,8 +22,8 @@ class Applicant {
     return axios.get(API_URL + "/company/" + id, headers);
   }
 
-  getApplicantsByJob(id) {
-    return axios.get(API_URL + "/byjob/" + id, headers);
+  getApplicantsByJob(id, status) {
+    return axios.get(API_URL + "/byjob/" + id + "/" + status, headers);
   }
 
   addApplicant(data) {

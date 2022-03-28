@@ -22,6 +22,11 @@ class Job {
     return axios.get(URL + "/" + id, headers);
   }
 
+  getJobsBySearch(data) {
+    console.log(data);
+    return axios.post(URL + "/search/job/", data, headers);
+  }
+  
   addJob(data) {
     return axios.post(URL, data, headers);
   }

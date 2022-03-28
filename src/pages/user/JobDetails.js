@@ -3,17 +3,14 @@ import {
   Card,
   CardActions,
   CardContent,
-  Typography,
+  Typography
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
 import { useSnackbar } from "react-simple-snackbar";
-import Sidebar from "../../components/Sidebar";
-import { addApplicant } from "../../redux/actions";
 import Applicant from "../../services/Applicant";
-import Job from "../../services/Job";
 
 const drawerWidth = 240;
 
@@ -113,7 +110,6 @@ export default function JobDetails() {
   // console.log(status);
   return (
     <>
-      <Sidebar />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Card

@@ -3,6 +3,7 @@ import {
   FormControl,
   Grid,
   InputLabel,
+  Menu,
   MenuItem,
   Select,
   TextField,
@@ -10,14 +11,15 @@ import {
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
+import DeleteIcon from "@material-ui/icons/Delete";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import { EditTwoTone, MoreVertRounded } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/Sidebar";
-import { deleteJob } from "../../redux/actions";
+import "../../CSS/JobScreen.css";
 import Job from "../../services/Job";
 
 const drawerWidth = 240;
@@ -26,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     minWidth: 275,
     float: "left",
+    position: "relative",
     margin: "0.5rem",
   },
   bullet: {
@@ -47,7 +50,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexGrow: 1,
     paddingTop: theme.spacing(5),
-    paddingLeft: theme.spacing(33),
+    paddingLeft: theme.spacing(20),
+    paddingRight: theme.spacing(4),
     "@media (max-width: 780px)": {
       padding: theme.spacing(0),
       marginLeft: theme.spacing(0),
@@ -56,10 +60,13 @@ const useStyles = makeStyles((theme) => ({
   },
   box: {
     marginLeft: "30rem",
+    marginTop: "6rem",
     "@media (max-width: 780px)": {
       padding: theme.spacing(0),
       marginLeft: theme.spacing(0),
       marginTop: theme.spacing(8),
+      maxWidth: "20rem",
+      marginLeft: "10rem",
     },
   },
 }));
@@ -67,12 +74,14 @@ const useStyles = makeStyles((theme) => ({
 export default function Jobs() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
+  const [jobId, setJobId] = useState();
   // const jobs = useSelector((state) => state.jobReducer);
   // const user = useSelector((state) => state.userReducer);
   // console.log(user);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("jobType");
   const dispatch = useDispatch();
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const classes = useStyles();
 
   const LOCAL_STORAGE = JSON.parse(localStorage.getItem("userData"));
@@ -87,7 +96,23 @@ export default function Jobs() {
     }
   }, []);
 
+  useEffect(() => {
+    Job.getJobsBySearch({ type, search }).then((res) => setJobs(res.data.data));
+    console.log("render");
+  }, [search]);
+
   console.log(jobs);
+
+  const handleClick = (event, id) => {
+    setAnchorEl(event.currentTarget);
+    setJobId(id);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  console.log(jobId);
 
   async function handleDelete(jobId) {
     await Job.deleteJob(jobId).then((res) => window.location.reload());
@@ -96,23 +121,22 @@ export default function Jobs() {
 
   return (
     <>
-      <Sidebar />
       <Box>
         <Typography component="div">
-          <Box
+          {/* <Box
             textAlign="center"
-            style={{ marginLeft: "14rem" }}
+            style={{ marginLeft: "14rem", marginTop: "5rem" }}
             fontWeight="fontWeightBold"
             m={1}
           >
             Filter
-          </Box>
+          </Box> */}
         </Typography>
         <Grid container spacing={3} className={classes.box}>
           <Grid item xs={12} sm={3}>
             <FormControl variant="outlined" fullWidth>
               <InputLabel id="demo-simple-select-outlined-label">
-                Company
+                Type
               </InputLabel>
               <Select
                 labelId="demo-simple-select-outlined-label"
@@ -121,12 +145,13 @@ export default function Jobs() {
                 value={type}
                 displayEmpty
                 name="company"
-                label="Company"
+                label="Type"
               >
                 <MenuItem value="jobType" selected="selected">
                   Job Type
                 </MenuItem>
                 <MenuItem value="company">Company</MenuItem>
+                <MenuItem value="city">City</MenuItem>
               </Select>
             </FormControl>
           </Grid>{" "}
@@ -142,52 +167,71 @@ export default function Jobs() {
           </Grid>
         </Grid>
       </Box>
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        <br />
-        {jobs &&
-          jobs
-            .filter((data) => {
-              if (search == null) return data;
-              else {
-                if (
-                  type === "jobType" &&
-                  data.type.toLowerCase().includes(search.toLowerCase())
-                ) {
-                  return data;
-                } else if (
-                  type === "company" &&
-                  data.companyId.name.toLowerCase().includes(search.toLowerCase())
-                ) {
-                  return data;
-                } else {
-                  return null;
-                }
-              }
-            })
-            .map((job) => (
-              <Card className={classes.root} variant="outlined">
+      <div className={classes.content}>
+        <main>
+          {/* <div className={classes.toolbar} /> */}
+          <br />
+          {jobs &&
+            jobs.map((job) => (
+              <Card
+                className={classes.root}
+                variant="outlined"
+                style={{
+                  minWidth: "25rem",
+                  maxWidth: "27rem",
+                  maxHeight: "25rem",
+                  minHeight: "17.5rem",
+                }}
+              >
+                {LOCAL_STORAGE.role !== 1 ? (
+                  <div
+                    style={{ position: "absolute", right: "1px", top: "18px" }}
+                  >
+                    <Button
+                      color="primary"
+                      size="small"
+                      onClick={(e) => handleClick(e, job._id)}
+                    >
+                      <MoreVertRounded />
+                    </Button>
+                  </div>
+                ) : (
+                  <></>
+                )}
+
                 <CardContent>
                   <Typography
                     className={classes.title}
                     color="textSecondary"
                     gutterBottom
                   ></Typography>
-                  <Typography variant="h5" component="h2">
-                    Job Name: {job.name}
+                  <Typography variant="body4" component="h1">
+                    {job.name}
                   </Typography>
-                  <Typography className={classes.pos} color="textSecondary">
+                  <Typography
+                    className={classes.pos}
+                    // color="textPrimary"
+                    variant="body4"
+                    component="h2"
+                    style={{fontWeight: "500"}}
+                  >
                     {job.type}
                   </Typography>
                   <Typography variant="body4" component="h2">
-                    {job.companyId.name},
+                    {job.companyId.name}
                   </Typography>
-                  <Typography variant="body1" component="h3">
+                  <Typography
+                    variant="body1"
+                    component="h3"
+                    color="textSecondary"
+                  >
                     {job.companyId.address}
                   </Typography>
                   <br />
                   <Typography variant="body2" component="p">
-                    {job.description}
+                    <u1 style={{ listStyle: "circle" }}>
+                      <li>{job.description}</li>
+                    </u1>
                   </Typography>
                 </CardContent>
                 {LOCAL_STORAGE.role === 2 ? (
@@ -197,6 +241,7 @@ export default function Jobs() {
                         color="primary"
                         size="small"
                         variant="contained"
+                        style={{ marginLeft: "10px" }}
                         onClick={() =>
                           navigate("/viewapplicants", {
                             state: { jobData: job },
@@ -205,9 +250,17 @@ export default function Jobs() {
                       >
                         View Applicants
                       </Button>
+
                       <Button
                         color="primary"
                         size="small"
+                        style={{
+                          position: "absolute",
+                          right: "20px",
+                          color: "white",
+                          borderColor: "#ff771c",
+                        }}
+                        startIcon={<EditTwoTone />}
                         variant="contained"
                         onClick={() =>
                           navigate("/addjob", {
@@ -215,21 +268,13 @@ export default function Jobs() {
                           })
                         }
                       >
-                        Modify Job
-                      </Button>
-                      <Button
-                        color="primary"
-                        size="small"
-                        variant="contained"
-                        onClick={() => handleDelete(job._id)}
-                      >
-                        Delete Job
+                        Edit Job
                       </Button>
                     </CardActions>
                   </>
                 ) : LOCAL_STORAGE.role === 0 ? (
                   <CardActions>
-                    <Button
+                    {/* <Button
                       color="primary"
                       variant="contained"
                       onClick={() =>
@@ -245,7 +290,7 @@ export default function Jobs() {
                       }
                     >
                       Edit Company
-                    </Button>
+                    </Button> */}
                   </CardActions>
                 ) : (
                   <CardActions>
@@ -264,7 +309,26 @@ export default function Jobs() {
                 )}
               </Card>
             ))}
-      </main>
+        </main>
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<DeleteIcon />}
+              onClick={() => handleDelete(jobId)}
+            >
+              Delete
+            </Button>
+          </MenuItem>
+        </Menu>
+      </div>
     </>
   );
 }

@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import { useSnackbar } from "react-simple-snackbar";
 import Typography from "@material-ui/core/Typography";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React, { useEffect, useState } from "react";
@@ -39,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp() {
   const dispatch = useDispatch();
+  const [openSnackbar] = useSnackbar();
   const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
 
@@ -68,10 +70,10 @@ export default function SignUp() {
 
     User.addUser(userData).then((res) => {
       if (res.data.success) {
-        alert(res.data.msg);
-        window.location.replace("/");
+        openSnackbar(res.data.msg);
+        setTimeout(window.location.replace("/"), 2000);
       } else {
-        alert(res.data.msg);
+        openSnackbar(res.data.msg);
       }
     });
 

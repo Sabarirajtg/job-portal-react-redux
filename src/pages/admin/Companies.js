@@ -5,11 +5,10 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import { DeleteTwoTone, EditRounded } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../components/Sidebar";
-import { deleteJob } from "../../redux/actions";
 import Company from "../../services/Company";
 import Job from "../../services/Job";
 
@@ -48,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   box: {
-    paddingTop: theme.spacing(5),
+    paddingTop: theme.spacing(15),
     paddingLeft: theme.spacing(60),
     maxWidth: 1200,
     color: "black",
@@ -82,7 +81,6 @@ export default function Companies() {
 
   return (
     <>
-      <Sidebar />
       <Box>
         <TextField
           className={classes.box}
@@ -110,7 +108,16 @@ export default function Companies() {
               }
             })
             .map((company) => (
-              <Card className={classes.root} variant="outlined">
+              <Card
+                className={classes.root}
+                variant="outlined"
+                style={{
+                  minWidth: "25rem",
+                  maxWidth: "27rem",
+                  maxHeight: "25rem",
+                  minHeight: "12rem",
+                }}
+              >
                 <CardContent>
                   <Typography
                     className={classes.title}
@@ -131,21 +138,23 @@ export default function Companies() {
                         color="primary"
                         size="small"
                         variant="contained"
+                        startIcon={<EditRounded />}
                         onClick={() =>
                           navigate("/addcompany", {
                             state: { companyData: company },
                           })
                         }
                       >
-                        Edit Company Details
+                        Edit
                       </Button>
                       <Button
-                        color="primary"
+                        style={{ color: "#ff3636", borderColor: "#ff3636" }}
                         size="small"
-                        variant="contained"
+                        startIcon={<DeleteTwoTone />}
+                        variant="outlined"
                         onClick={() => handleDelete(company._id)}
                       >
-                        Delete Company
+                        Delete
                       </Button>
                     </CardActions>
                   </>

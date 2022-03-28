@@ -112,7 +112,7 @@ export default function AddJob() {
 
   return (
     <>
-      <Sidebar />
+      {/* <Sidebar /> */}
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Container component="main" maxWidth="xs">

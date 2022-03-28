@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
-import Sidebar from "../../components/Sidebar";
-import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
+import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import { useSelector, useDispatch } from "react-redux";
-import { changeRole } from "../../redux/actions";
-import User from "../../services/User";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useSnackbar } from "react-simple-snackbar";
+import User from "../../services/User";
 
 const drawerWidth = 240;
 
@@ -36,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
+    paddingTop:theme.spacing(6),
     paddingLeft: theme.spacing(33),
     "@media (max-width: 780px)": {
       padding: theme.spacing(0),
@@ -77,7 +76,6 @@ export default function Users() {
   if (LOCAL_STORAGE.role === 1) {
     return (
       <>
-        <Sidebar />
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <h1>
@@ -91,7 +89,6 @@ export default function Users() {
 
   return (
     <>
-      <Sidebar />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         {users.map((user, index) => (

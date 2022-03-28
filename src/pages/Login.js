@@ -79,6 +79,7 @@ export default function Login() {
       window.location.replace("/jobs");
       localStorage.setItem("userData", JSON.stringify(loginData.data.user));
     } else {
+      openSnackbar(loginData.data.msg);
       console.log(loginData.data.msg);
     }
   };

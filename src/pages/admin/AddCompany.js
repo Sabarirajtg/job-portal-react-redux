@@ -6,12 +6,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addJob, modifyJob } from "../../redux/actions";
-import Sidebar from "../../components/Sidebar";
-import { v4 as uuid } from "uuid";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSnackbar } from "react-simple-snackbar";
 import Company from "../../services/Company";
 
@@ -89,7 +85,6 @@ export default function AddCompany() {
   if (JSON.parse(localStorage.getItem("userData")).role === 1) {
     return (
       <>
-        <Sidebar />
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <h1>
@@ -103,7 +98,6 @@ export default function AddCompany() {
 
   return (
     <>
-      <Sidebar />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <Container component="main" maxWidth="xs">
